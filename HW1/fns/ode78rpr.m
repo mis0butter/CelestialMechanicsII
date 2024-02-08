@@ -102,7 +102,7 @@ while (t*forward < tfinal*forward) %& (abs(h) >= hmin)  %rprmod
     end
     % Update the solution only if the error is acceptable
     if varstep==false   |  delta <= tau  | abs(h)==hmin     
-        t = t + h
+        t = t + h; 
         y = y + h*f*chiGL;
         tout = [tout; t];
         yout = [yout; y.'];

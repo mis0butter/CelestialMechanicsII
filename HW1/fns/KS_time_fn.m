@@ -1,4 +1,4 @@
-function KS_time = KS_time_fn( u0, uprime0, tau, eps ) 
+function u_uprime_t = KS_time_fn( u0, uprime0, tau, eps ) 
 % Take the KS variables, energy and tau as input and
 % converts them to the KS variables and time at the specified tau
 
@@ -31,6 +31,6 @@ function KS_time = KS_time_fn( u0, uprime0, tau, eps )
         -2*w * red * cos(wtau)^2 - sin(wtau) * black1 * cos(wtau) + w * black2 * tau ... 
         ) ;  
     
-    KS_time = [ u; uprime; t ] ; 
+    u_uprime_t = [ u; uprime; t ] ; 
 
 end 
