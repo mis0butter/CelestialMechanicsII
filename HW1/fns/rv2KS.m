@@ -1,4 +1,5 @@
 function KS = rv2KS( rv ) 
+% Cartesian (r, v) --> KS (u, uprime) 
 
     if ~iscolumn( rv ) 
         rv = rv' ; 

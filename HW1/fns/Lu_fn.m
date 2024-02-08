@@ -1,4 +1,5 @@
 function Lu = Lu_fn(u) 
+% Linear operator L 
 
     Lu = [  u(1)    -u(2)   -u(3)   u(4)  ; 
             u(2)    u(1)    -u(4)   -u(3) ; 
