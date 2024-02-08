@@ -37,16 +37,25 @@ u0      = KS0(1:4) ;
 uprime0 = KS0(5:8) ; 
 t0      = 0 ; 
 eps     = 2 * dot( uprime0, uprime0 ) / ( dot( u0, u0 ) ) - mu / ( dot( u0, u0 ) ) ; 
-% tau = 2 
 
-% KS_time = KS_time_fn( u0, uprime0, tau, eps ) ;  
+% dummy test 
+tau     = 2 ; 
+KS_time = KS_time_fn( u0, uprime0, tau, eps ) ;  
 
-% period 
+%% part c: What is the theoretical tau period? What is the initial 
+% cartesian state? What is the initial KS state?
+
+% period in time (s) 
 T = 2*pi*sqrt( a^3 / mu ) ; 
+    
+% period in tau (tau units) 
+k = 1 ; 
+T_tau = T / ( k * a ) ; 
 
+% check your answer 
 t_hist   = [] ; 
 tau_hist = [] ; 
-for tau = 1 : 100 
+for tau = 1 : 0.1 : 2*T 
     
     KS_time = KS_time_fn( u0, uprime0, tau, eps ) ; 
     t = KS_time(end) ; 
@@ -56,11 +65,18 @@ for tau = 1 : 100
     
 end 
 
+clf 
 figure(1) ; hold on ; grid on ; 
-    plot( t_hist ) ; 
-    yline( T ) ; 
+    plot( t_hist, t_hist ) ; 
+%     yline( T ) ; 
+    plot( t_hist, T * ones(size(t_hist)), 'red' ) ; 
+    plot( tau_hist, t_hist, 'green' ) ;
+    legend( 't', 'T', 'tau' ) ; 
+    ylabel('t (s)') 
     
-%% part d: 
+%% part d: Analytically propagate the orbit for 60 equal steps in tau for 1 
+% period. For each step, traverse from the initial conditions all the way 
+% to the intermediate tau.
 
 toler   = 1e-8;         % 1e-14 accurate; 1e-6 coarse 
 options = odeset('reltol', toler, 'abstol', toler ); 
