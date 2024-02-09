@@ -158,22 +158,7 @@ figure(3) ; hold on ; grid on ;
 % v: Compute the K numerical check at each step, and plot the results on a
 % single plot 
 
-K_A_hist = [] ; 
-K_B_hist = [] ; 
-for i = 1 : length(tau_hist) 
-    
-%     eps         = eps_hist(i,:) ; 
-    u           = u_hist(i,:) ; 
-    uprime      = uprime_hist(i,:) ; 
-    
-    K_A         = - eps/2 * dot(u,u) + dot(uprime, uprime) - mu/2 ;     
-    K_A_hist    = [ K_A_hist ; K_A ] ;     
-    
-    K2          = eps - 2 * dot( uprime,uprime ) / dot( u,u ) + mu / dot( u,u ) ; 
-    K_B         = - dot( u,u ) / 2 * K2 ; 
-    K_B_hist    = [ K_B_hist ; K_B ] ; 
-    
-end 
+[ K_A_hist, K_B_hist ] = K_check( state_hist, mu ) ; 
 
 figure(4) ; hold on ; grid on ; 
     scatter( tau_hist, K_A_hist ) ; 
@@ -202,18 +187,19 @@ disp([ rv_hist(1,:) - rv_hist(end,:) ]')
 
 clf 
 
-% options 
-tol     = 1e-14;         % 1e-14 accurate; 1e-6 coarse 
-options = odeset('reltol', tol, 'abstol', tol ); 
+%tol should very from 1e-17 fine to 1e-4 course (or 0.0 for fixed step
+tol = 0.0;         
 
 % 0 perturbation 
 a = zeros(4,1) ; 
 
+% steps 
+N = 60 ; 
+
 % Solve ODE 
 state0   = [ KS0 ; t0 ; eps ] ; 
 tau_span = [ 0 T_tau ] ; 
-% [tau_hist, state] = ode45(@(tau, KS_t_eps) KS_EOM( tau, KS_t_eps, a, mu), tau_span, state0, options) ; 
-[tau_hist, state] = ode78rpr(@(tau, KS_t_eps) KS_EOM( tau, KS_t_eps, a, mu), 0, T_tau, T_tau / 60, state0, 0.0) ; 
+[tau_hist, state] = ode78rpr(@(tau, KS_t_eps) KS_EOM( tau, KS_t_eps, a, mu), 0, T_tau, T_tau / N, state0, tol) ; 
 
 % extract 
 u_hist      = state(:, 1:4) ; 
@@ -222,7 +208,7 @@ t_hist      = state(:, 9) ;
 eps_hist    = state(:, 10) ; 
 
 % get Cartesian hist 
-rv_hist = [] 
+rv_hist = [] ; 
 for i = 1 : length(u_hist) 
     KS      = [ u_hist(i,:)' ; uprime_hist(i,:)' ] ; 
     rv      = KS2rv( KS )' ;    
@@ -233,15 +219,7 @@ end
 
 
 
-%% subfunctions 
 
-function KS_zero = KS_zero_fn( u0, uprime0, tau, eps ) 
-
-    KS_time = KS_time_fn( u0, uprime0, tau, eps ) ; 
-    t = KS_time(end) ; 
-
-
-end 
 
 
 
