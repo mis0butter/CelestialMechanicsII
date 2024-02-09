@@ -193,19 +193,46 @@ tol = 0.0;
 % 0 perturbation 
 a = zeros(4,1) ; 
 
-% steps 
-N = 20 ; 
-
 % Solve ODE 
 state0   = [ KS0 ; t0 ; eps0 ] ; 
 
-% propagate 
-[ state_num, rv_num ] = prop_KS_num( state0, a, mu, T_tau, N, tol ) ; 
-[ state_ana, rv_ana ] = prop_KS_ana( state0, T_tau, N ) ; 
+% loop for tau steps 
+for N = [ 3, 5, 10, 20, 40, 80 ] 
+    
+    % propagate 
+    [ state_num, rv_num ] = prop_KS_num( state0, a, mu, T_tau, N, tol ) ; 
+    [ state_ana, rv_ana ] = prop_KS_ana( state0, T_tau, N ) ; 
 
-% i: Plot the K numerical check as a function of tau 
-[ K_A_num, K_B_num ]  = K_check( state_num, mu, 1, N ) ;   
-[ K_A_ana, K_B_ana ]  = K_check( state_ana, mu, 1, N ) ;   
+    % i: Plot the K numerical check as a function of tau 
+    [ K_A_num, K_B_num ]  = K_check( state_num, mu, 1, N, 'Numerical' ) ;   
+%     [ K_A_ana, K_B_ana ]  = K_check( state_ana, mu, 1, N, 'Analytical' ) ;   
+
+    % extract 
+    r_num = rv_num(:, 1:3) ; v_num = rv_num(:, 4:6) ; 
+    r_ana = rv_ana(:, 1:3) ; v_ana = rv_ana(:, 4:6) ; 
+    t_num = state_num(:, 9) ; 
+    t_ana = state_ana(:, 9) ; 
+
+    % position, velocity, and time error norm 
+    pos_err = [] ; vel_err = [] ; t_err = [] ; 
+    for i = 1 : N + 1 
+        
+        pos_err(i,:) = norm( r_num(i,:) - r_ana(i,:) ) ; 
+        vel_err(i,:) = norm( v_num(i,:) - v_ana(i,:) ) ; 
+        t_err(i,:)   = norm( t_num(i,:) - t_ana(i,:) ) ; 
+        
+    end 
+    
+    tau_hist = state_num(:,11) ; 
+    plot( tau_hist, pos_err ) ;
+    plot( tau_hist, vel_err ) ; 
+    plot( tau_hist, t_err ) ; 
+    
+    legend( 'K method 1', 'K method 2', '|pos err|', '|vel err|', '|t err|', ... 
+        'location', 'northwest' ) ; 
+    
+end 
+
 
 % ii: On the same plot as i, give the norms of the position, velocity and 
 % time differences (total of 4 curves on the one plot) between the 
@@ -213,6 +240,10 @@ state0   = [ KS0 ; t0 ; eps0 ] ;
 % integrated solution with N equal steps. (don�t use log scale since K can 
 % be negative, and put N in the title.) 
 
+%% save all figs 
+
+folder_name = 'outputs';   % Your destination folder
+save_all_figs(folder_name) 
 
 
 

@@ -1,4 +1,4 @@
-function [ K_A_hist, K_B_hist ] = K_check( state, mu, plot_option, N )
+function [ K_A_hist, K_B_hist ] = K_check( state, mu, plot_option, N, plot_title )
 % Compute K at each step. State must contain u and uprime in columns 1-8 
 
     if ~exist('plot_option', 'var') 
@@ -6,6 +6,9 @@ function [ K_A_hist, K_B_hist ] = K_check( state, mu, plot_option, N )
     end 
     if ~exist('N', 'var') 
         N = 0 ; 
+    end 
+    if ~exist('plot_title', 'var') 
+        plot_title = NaN ; 
     end 
 
     % extract 
@@ -41,7 +44,7 @@ function [ K_A_hist, K_B_hist ] = K_check( state, mu, plot_option, N )
             scatter( tau_hist, K_B_hist, 'x' ) ; 
             legend( 'method 1', 'method 2', 'location', 'northwest' ) ; 
             xlabel('\tau') ; ylabel('K') ; 
-            title( ['\tau vs K for N = ', num2str(N) ] ) ; 
+            title( [ plot_title, ' tau vs K for N = ', num2str(N) ] ) ; 
 
     end 
 
