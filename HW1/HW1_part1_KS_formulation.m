@@ -194,7 +194,7 @@ tol = 0.0;
 a = zeros(4,1) ; 
 
 % steps 
-N = 60 ; 
+N = 20 ; 
 
 % Solve ODE 
 state0   = [ KS0 ; t0 ; eps ] ; 
@@ -214,6 +214,8 @@ for i = 1 : length(u_hist)
     rv      = KS2rv( KS )' ;    
     rv_hist = [ rv_hist ; rv ] ; 
 end 
+
+[state_test, rv_hist_test] = prop_KS( state0, a, mu, T_tau, N, tol ) ; 
     
 
 
