@@ -1,5 +1,6 @@
 %% PART 1: KS FORMULATION 
 
+close all 
 init 
 
 %% PART 1.1: UNPERTURBED 
@@ -78,8 +79,6 @@ figure() ; hold on ; grid on ;
 %% part d: Analytically propagate the orbit for 60 equal steps in tau for 1 
 % period. For each step, traverse from the initial conditions all the way 
 % to the intermediate tau.
-
-close all 
 
 % tau steps 
 N = 60 ; 
@@ -172,7 +171,7 @@ figure() ; hold on ; grid on ;
     
     
 % ----------------------- %      
-% vi. Report |u0- uf | and | u’0- u’f | 
+% vi. Report |u0- uf | and | uï¿½0- uï¿½f | 
 
 disp('[ u_hist(1,:) - u_hist(end,:) ] = ') 
 disp([ u_hist(1,:) - u_hist(end,:) ]')
@@ -188,8 +187,6 @@ disp([ rv_hist(1,:) - rv_hist(end,:) ]')
 % formulation, 1 period of the same orbit for N equal steps in tau, using 
 % the fixed step integrator. Repeat the following for N={3,5,10,20,40,80}
 
-clf 
-
 %tol should very from 1e-17 fine to 1e-4 course (or 0.0 for fixed step
 tol = 0.0;         
 
@@ -202,17 +199,20 @@ N = 20 ;
 % Solve ODE 
 state0   = [ KS0 ; t0 ; eps ] ; 
 
-% perform checks 
-[ state_hist, rv_hist ] = prop_KS_num( state0, a, mu, T_tau, N, tol ) ; 
+% propagate 
+[ state_num, rv_num ] = prop_KS_num( state0, a, mu, T_tau, N, tol ) ; 
+[ state_ana, rv_ana ] = prop_KS_ana( state0, T_tau, N ) ; 
 
 % i: Plot the K numerical check as a function of tau 
-[ K_A_hist, K_B_hist ]  = K_check( state_hist, mu, 1, N ) ;   
+[ K_A_num, K_B_num ]  = K_check( state_num, mu, 1, N ) ;   
+[ K_A_ana, K_B_ana ]  = K_check( state_ana, mu, 1, N ) ;   
 
 % ii: On the same plot as i, give the norms of the position, velocity and 
 % time differences (total of 4 curves on the one plot) between the 
 % analytical solution using the subroutine from 1b) and the numerically 
-% integrated solution with N equal steps. (don’t use log scale since K can 
-% be negative, and put N in the title.)
+% integrated solution with N equal steps. (donï¿½t use log scale since K can 
+% be negative, and put N in the title.) 
+
 
 
 
