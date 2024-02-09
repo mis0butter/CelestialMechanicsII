@@ -81,7 +81,10 @@ figure() ; hold on ; grid on ;
 
 close all 
 
-tau_hist   = [ 0 : T_tau / 60 : T_tau ] ; 
+% tau steps 
+N = 60 ; 
+
+tau_hist   = [ 0 : T_tau / N : T_tau ] ; 
 state_hist = [] ; 
 for tau = tau_hist  
 
@@ -123,7 +126,7 @@ figure(1) ;
     scatter3( rv_hist(:,1), rv_hist(:,2), rv_hist(:,3) ) ; 
     view(30, 30) 
     xlabel('x (LU)') ; ylabel('y (LU)') ; zlabel('z (LU)') ; 
-    title('Cartesian trajectory ') ; 
+    title('Analytical Cartesian trajectory ') ; 
 
     
 % ----------------------- % 
@@ -142,7 +145,7 @@ figure(2) ;
     plot( tau_hist, uprime_hist, '--' ) ; 
     legend( 'u1', 'u2', 'u3', 'u4', 'uprime1', 'uprime2', 'uprime3', 'uprime4', 'location', 'eastoutside' ) ; 
     xlabel('\tau') ; ylabel('u, uprime') ; 
-    title( '\tau vs \{ u, uprime \}' ) ; 
+    title( 'Analytical \tau vs \{ u, uprime \}' ) ; 
     
     
 % ----------------------- %  
@@ -151,7 +154,7 @@ figure(2) ;
 figure(3) ; hold on ; grid on ; 
     plot( tau_hist, t_hist ) ; 
     xlabel('\tau') ; ylabel('t (s)') 
-    title( '\tau vs t' ) ; 
+    title( 'Analytical \tau vs t' ) ; 
 
   
 % ----------------------- %      
@@ -160,12 +163,12 @@ figure(3) ; hold on ; grid on ;
 
 [ K_A_hist, K_B_hist ] = K_check( state_hist, mu ) ; 
 
-figure(4) ; hold on ; grid on ; 
+figure() ; hold on ; grid on ; 
     scatter( tau_hist, K_A_hist ) ; 
     scatter( tau_hist, K_B_hist, 'x' ) ; 
     legend( 'method 1', 'method 2', 'location', 'northwest' ) ; 
     xlabel('\tau') ; ylabel('K') ; 
-    title( '\tau vs K' ) ; 
+    title( 'Analytical \tau vs K' ) ; 
     
     
 % ----------------------- %      
@@ -198,25 +201,19 @@ N = 20 ;
 
 % Solve ODE 
 state0   = [ KS0 ; t0 ; eps ] ; 
-tau_span = [ 0 T_tau ] ; 
-[tau_hist, state] = ode78rpr(@(tau, KS_t_eps) KS_EOM( tau, KS_t_eps, a, mu), 0, T_tau, T_tau / N, state0, tol) ; 
 
-% extract 
-u_hist      = state(:, 1:4) ; 
-uprime_hist = state(:, 5:8) ; 
-t_hist      = state(:, 9) ; 
-eps_hist    = state(:, 10) ; 
+% perform checks 
+[ state_hist, rv_hist ] = prop_KS_num( state0, a, mu, T_tau, N, tol ) ; 
 
-% get Cartesian hist 
-rv_hist = [] ; 
-for i = 1 : length(u_hist) 
-    KS      = [ u_hist(i,:)' ; uprime_hist(i,:)' ] ; 
-    rv      = KS2rv( KS )' ;    
-    rv_hist = [ rv_hist ; rv ] ; 
-end 
+% i: Plot the K numerical check as a function of tau 
+[ K_A_hist, K_B_hist ]  = K_check( state_hist, mu, 1, N ) ;   
 
-[state_test, rv_hist_test] = prop_KS( state0, a, mu, T_tau, N, tol ) ; 
-    
+% ii: On the same plot as i, give the norms of the position, velocity and 
+% time differences (total of 4 curves on the one plot) between the 
+% analytical solution using the subroutine from 1b) and the numerically 
+% integrated solution with N equal steps. (don’t use log scale since K can 
+% be negative, and put N in the title.)
+
 
 
 

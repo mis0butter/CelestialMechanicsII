@@ -1,4 +1,6 @@
-function [state, rv_hist] = prop_KS( state0, a, mu, T_tau, N, tol ) 
+function [state, rv_hist] = prop_KS_num( state0, a, mu, T_tau, N, tol ) 
+% propagate fixed-step KS EOM. state contains: 
+%   u, uprime, t, eps (energy) 
 
     % Solve ODE 
     [tau_hist, state] = ode78rpr(@(tau, KS_t_eps) KS_EOM( tau, KS_t_eps, a, mu), 0, T_tau, T_tau / N, state0, tol) ; 
@@ -16,5 +18,8 @@ function [state, rv_hist] = prop_KS( state0, a, mu, T_tau, N, tol )
         rv      = KS2rv( KS )' ;    
         rv_hist = [ rv_hist ; rv ] ; 
     end 
+    
+    % add to state 
+    state(:,11) = tau_hist ; 
 
 end 
