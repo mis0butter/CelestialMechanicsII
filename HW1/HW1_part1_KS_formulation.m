@@ -37,11 +37,11 @@ rv  = KS2rv( KS0 ) ;    % check
 u0      = KS0(1:4) ; 
 uprime0 = KS0(5:8) ; 
 t0      = 0 ; 
-eps     = 2 * dot( uprime0, uprime0 ) / ( dot( u0, u0 ) ) - mu / ( dot( u0, u0 ) ) ; 
+eps0    = 2 * dot( uprime0, uprime0 ) / ( dot( u0, u0 ) ) - mu / ( dot( u0, u0 ) ) ; 
 
 % dummy test 
 tau     = 2 ; 
-KS_time = KS_time_fn( u0, uprime0, tau, eps ) ;  
+KS_time = KS_time_fn( u0, uprime0, tau, eps0 ) ;  
 
 
 %% part c: What is the theoretical tau period? What is the initial 
@@ -59,7 +59,7 @@ t_hist   = [] ;
 tau_hist = [] ; 
 for tau = 1 : 0.1 : 2*T 
     
-    KS_time = KS_time_fn( u0, uprime0, tau, eps ) ; 
+    KS_time = KS_time_fn( u0, uprime0, tau, eps0 ) ; 
     t = KS_time(end) ; 
     
     t_hist   = [ t_hist ; t ] ; 
@@ -87,7 +87,7 @@ tau_hist   = [ 0 : T_tau / N : T_tau ] ;
 state_hist = [] ; 
 for tau = tau_hist  
 
-    u_uprime_t = KS_time_fn( u0, uprime0, tau, eps ) ; 
+    u_uprime_t = KS_time_fn( u0, uprime0, tau, eps0 ) ; 
     state_hist = [ state_hist ; u_uprime_t' ] ; 
     
 end 
@@ -171,7 +171,7 @@ figure() ; hold on ; grid on ;
     
     
 % ----------------------- %      
-% vi. Report |u0- uf | and | u�0- u�f | 
+% vi. Report | u0 - uf | and | u'0 - u'f | 
 
 disp('[ u_hist(1,:) - u_hist(end,:) ] = ') 
 disp([ u_hist(1,:) - u_hist(end,:) ]')
@@ -197,7 +197,7 @@ a = zeros(4,1) ;
 N = 20 ; 
 
 % Solve ODE 
-state0   = [ KS0 ; t0 ; eps ] ; 
+state0   = [ KS0 ; t0 ; eps0 ] ; 
 
 % propagate 
 [ state_num, rv_num ] = prop_KS_num( state0, a, mu, T_tau, N, tol ) ; 

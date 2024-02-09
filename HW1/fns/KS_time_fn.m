@@ -31,6 +31,7 @@ function u_uprime_t = KS_time_fn( u0, uprime0, tau, eps )
         -2*w * red * cos(wtau)^2 - sin(wtau) * black1 * cos(wtau) + w * black2 * tau ... 
         ) ;  
     
+    % output 
     u_uprime_t = [ u; uprime; t ] ; 
 
 end 
