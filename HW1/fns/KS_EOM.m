@@ -4,6 +4,8 @@ function KS_t_eps_prime = KS_EOM( tau, KS_t_eps, a, mu )
     % get u and uprime (tau velocity)  
     u        = KS_t_eps(1:4) ; 
     u_prime  = KS_t_eps(5:8) ; 
+    
+    % a is in VTN frame. Transform into u basis ? 
         
     % get uprimeprime (tau acceleration) 
     r               = dot( u, u ) ; 

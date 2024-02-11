@@ -83,13 +83,12 @@ figure() ; hold on ; grid on ;
 % tau steps 
 N = 60 ; 
 
+% analytically propagate unperturbed KS 
 tau_hist   = [ 0 : T_tau / N : T_tau ] ; 
 state_hist = [] ; 
 for tau = tau_hist  
-
     u_uprime_t = KS_time_fn( u0, uprime0, tau, eps0 ) ; 
     state_hist = [ state_hist ; u_uprime_t' ] ; 
-    
 end 
 
 % extract 
@@ -99,7 +98,7 @@ t_hist      = state_hist(:, 9) ;
 % eps_hist    = state(:, 10) ; 
 
 % get Cartesian hist 
-rv_hist = [] 
+rv_hist = [] ; 
 for i = 1 : length(u_hist) 
     KS      = [ u_hist(i,:)' ; uprime_hist(i,:)' ] ; 
     rv      = KS2rv( KS )' ;    
@@ -120,13 +119,8 @@ sprintf( "T = %.10g s", T )
 % lines connecting them. Use >>view(30,30) to see the 3D component. 
 
 figure(1) ; 
-    plot3( rv_hist(:,1), rv_hist(:,2), rv_hist(:,3) ) ; 
-    hold on ; grid on ; 
-    scatter3( rv_hist(:,1), rv_hist(:,2), rv_hist(:,3) ) ; 
-    view(30, 30) 
-    xlabel('x (LU)') ; ylabel('y (LU)') ; zlabel('z (LU)') ; 
-    title('Analytical Cartesian trajectory ') ; 
-
+    plot_rv(rv_hist, 'Analytical Cartesisan Trajectory') ; 
+    
     
 % ----------------------- % 
 % iii: Plot each of the output {u, u'} states as a function of tau on a 
@@ -208,7 +202,7 @@ for N = [ 3, 5, 10, 20, 40, 80 ]
     % ii: On the same plot as i, give the norms of the position, velocity and 
     % time differences (total of 4 curves on the one plot) between the 
     % analytical solution using the subroutine from 1b) and the numerically 
-    % integrated solution with N equal steps. (don�t use log scale since K can 
+    % integrated solution with N equal steps. (don't use log scale since K can 
     % be negative, and put N in the title.) 
     [ K_A_num, K_B_num ]  = K_check( state_num, mu, 1, N, 'Numerical' ) ;   
 %     [ K_A_ana, K_B_ana ]  = K_check( state_ana, mu, 1, N, 'Analytical' ) ;   
@@ -244,12 +238,30 @@ end
 % save_all_figs(folder_name) 
 
 
-%% PART 1.2: PERTURBED 
-
-
-%% Add the perturbation acceleration a to your numerical simulation of KS.
+%% PART 1.2: PERTURBED
+% Add the perturbation acceleration a to your numerical simulation of KS.
 % Include energy as the 10th state. You can use the examples in the notes 
-% to validate your code.
+% to validate your code. 
+
+
+%% part a: Analytically, prove that that epsilon_prime = 0 when dot(a, 
+% rdot) = 0. Validate with your numerical code. 
+
+% set velocity to 0 
+rv_v0       = rv0 ; 
+rv_v0(4:6)  = zeros(3,1) ; 
+KS_v0       = rv2KS( rv_v0 ) ; 
+
+% get tau derivatives with nonzero perturbation 
+a           = rand(4,1) ; 
+state_prime = KS_EOM( tau, KS_v0, a, mu ) ; 
+eps_prime   = state_prime(end)  
+
+
+%% part b: Apply a thrust in the VTN frame, using a thrust magnitude of 
+% 0.03 LU/TU2, longitude=60 deg, latitude=30 deg. Propagate for 4 periods 
+% (using the IC’s assuming ballistic motion) and 120 total equal steps in 
+% tau. Use the same fixed step integrator.
 
 
 
