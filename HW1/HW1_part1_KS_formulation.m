@@ -204,6 +204,12 @@ for N = [ 3, 5, 10, 20, 40, 80 ]
     [ state_ana, rv_ana ] = prop_KS_ana( state0, T_tau, N ) ; 
 
     % i: Plot the K numerical check as a function of tau 
+    
+    % ii: On the same plot as i, give the norms of the position, velocity and 
+    % time differences (total of 4 curves on the one plot) between the 
+    % analytical solution using the subroutine from 1b) and the numerically 
+    % integrated solution with N equal steps. (don�t use log scale since K can 
+    % be negative, and put N in the title.) 
     [ K_A_num, K_B_num ]  = K_check( state_num, mu, 1, N, 'Numerical' ) ;   
 %     [ K_A_ana, K_B_ana ]  = K_check( state_ana, mu, 1, N, 'Analytical' ) ;   
 
@@ -216,11 +222,9 @@ for N = [ 3, 5, 10, 20, 40, 80 ]
     % position, velocity, and time error norm 
     pos_err = [] ; vel_err = [] ; t_err = [] ; 
     for i = 1 : N + 1 
-        
         pos_err(i,:) = norm( r_num(i,:) - r_ana(i,:) ) ; 
         vel_err(i,:) = norm( v_num(i,:) - v_ana(i,:) ) ; 
         t_err(i,:)   = norm( t_num(i,:) - t_ana(i,:) ) ; 
-        
     end 
     
     tau_hist = state_num(:,11) ; 
@@ -234,16 +238,21 @@ for N = [ 3, 5, 10, 20, 40, 80 ]
 end 
 
 
-% ii: On the same plot as i, give the norms of the position, velocity and 
-% time differences (total of 4 curves on the one plot) between the 
-% analytical solution using the subroutine from 1b) and the numerically 
-% integrated solution with N equal steps. (don�t use log scale since K can 
-% be negative, and put N in the title.) 
+% save all figs 
 
-%% save all figs 
+% folder_name = 'outputs';   % Your destination folder
+% save_all_figs(folder_name) 
 
-folder_name = 'outputs';   % Your destination folder
-save_all_figs(folder_name) 
+
+%% PART 1.2: PERTURBED 
+
+
+%% Add the perturbation acceleration a to your numerical simulation of KS.
+% Include energy as the 10th state. You can use the examples in the notes 
+% to validate your code.
+
+
+
 
 
 

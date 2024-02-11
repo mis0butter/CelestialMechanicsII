@@ -21,5 +21,11 @@ function [state, rv_hist] = prop_KS_num( state0, a, mu, T_tau, N, tol )
     
     % add to state 
     state(:,11) = tau_hist ; 
+    
+    % sometimes last state is propagated basically 0 tau, check for that 
+    dtau_hist = diff(tau_hist) ; 
+    if any( dtau_hist < 1e-10 ) 
+        state = state(1:end-1,:) ; 
+    end 
 
 end 
