@@ -254,7 +254,7 @@ KS_v0       = rv2KS( rv_v0 ) ;
 % get tau derivatives with nonzero perturbation 
 a           = rand(4,1) ; 
 state_prime = KS_EOM( tau, KS_v0, a, mu ) ; 
-eps_prime   = state_prime(end)  
+eps_prime   = state_prime(end) ; 
 
 
 %% part b: Apply a thrust in the VTN frame, using a thrust magnitude of 
@@ -263,46 +263,38 @@ eps_prime   = state_prime(end)
 % tau. Use the same fixed step integrator.
 
 % a in VTN frame 
-Tmag  = 0.005 ; 
-lon   = 0 * pi/180 ; 
-lat   = 90 * pi/180 ; 
+Tmag  = 0.03 ; 
+lon   = 60 * pi/180 ; 
+lat   = 30 * pi/180 ; 
 a_VTN = latlon2VTN( Tmag, lat, lon ) ; 
 
-a       = 1 ;             % LU 
-e       = 0.7 ; 
-i       = 40 * pi/180;      % deg
-w       = 0 ;  % deg 
-Omega   = 0 ;  % deg 
-nu      = 0 ;  % deg 
-mu      = 1 ;            % LU^3 / TU^2 
+N = 120 ; 
+[ state_num, rv_num ] = prop_KS_num( state0, a_VTN, mu, T_tau * 4, N, tol ) ; 
 
-% orbital elements and cartesian 
-oe0     = [ a; e; i; w; Omega; nu ] ; 
-rv0     = oe2rv( oe0, mu ) ; 
+% part c: What is the Δτ for each step?
+tau_hist  = state_num( :, 11 ) ; 
+dtau_hist = diff(tau_hist) ; 
+dtau      = dtau_hist(end) ; 
 
-r0 = rv0(1:3) ; 
-v0 = rv0(4:6) ; 
+% part d: Plot the Cartesian trajectory. Give a 3D view, and XY, YZ, and XZ 
+% projections on the same plot.
 
-% { u, u' } <--> { r, v } 
-KS0 = rv2KS( rv0 ) ; 
-rv  = KS2rv( KS0 ) ;    % check 
-
-u0      = KS0(1:4) ; 
-uprime0 = KS0(5:8) ; 
-t0      = 0 ; 
-eps0    = 2 * dot( uprime0, uprime0 ) / ( dot( u0, u0 ) ) - mu / ( dot( u0, u0 ) ) ; 
-
-% period in time (s) 
-T = 2*pi*sqrt( a^3 / mu ) ; 
+figure() ; 
+    subplot(4,1,1)  
+        plot_rv( rv_num, '3D view' ) 
+    subplot(4,1,2) 
+        plot_rv( rv_num, 'XY' )
+        view(0,90) 
+    subplot(4,1,3) 
+        plot_rv( rv_num, 'YZ' )
+        view(90,0)
+    subplot(4,1,4) 
+        plot_rv( rv_num, 'XZ' )
+        view(0,0) 
+    sgtitle('Cartesian trajectory of perturbed motion') ; 
     
-% period in tau (tau units) 
-k = 1 ; 
-T_tau = T / ( k * a ) ; 
-
-state0  = [ u0 ; uprime0 ; t0 ; eps0 ] ; 
-
-[ state_num, rv_num ] = prop_KS_num( state0, a_VTN, mu, T_tau * 10, N * 10, tol ) ; 
-plot_rv( rv_num ) ; 
+% part e: Plot the K numerical check as a function of tau 
+[ K_A_num, K_B_num ]  = K_check( state_num, mu, 1, N, 'Numerical' ) ; 
 
 
 

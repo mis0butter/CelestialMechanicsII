@@ -4,7 +4,7 @@ function plot_rv( rv_hist, plot_title )
         plot_title = 'Cartesian Trajectory'; 
     end 
 
-    figure() ; 
+%     figure() ; 
         plot3( rv_hist(:,1), rv_hist(:,2), rv_hist(:,3) ) ; 
         hold on ; grid on ; 
         scatter3( rv_hist(:,1), rv_hist(:,2), rv_hist(:,3) ) ; 
@@ -13,3 +13,6 @@ function plot_rv( rv_hist, plot_title )
         title(plot_title) ; 
 
 end 
+
+
+
