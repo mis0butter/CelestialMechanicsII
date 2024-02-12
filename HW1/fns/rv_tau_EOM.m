@@ -1,16 +1,19 @@
-function d_rv_t = rv_tau_EOM( rv_tau, a_VTN, mu, k, alpha ) 
+function d_rvt_dtau = rv_tau_EOM( tau, r_v_tau_t, a, mu, k, alpha ) 
 % Integrate equations of motion for Cartesian state and tau velocity 
 
-    r       = rv_tau(1:3) ; 
-    v_tau   = rv_tau(4:6) ; 
-    t       = rv_tau(end) ; 
+    r       = r_v_tau_t(1:3) ; 
+    v_tau   = r_v_tau_t(4:6) ; 
+    t       = r_v_tau_t(end) ; 
     
-    d_rv_t  = zeros(7,1) ; 
-    d_rv_t(1:3) = v_tau ; 
-    d_rv_t(4:6) = alpha * norm(v_tau) / norm(r) * v_tau ... 
-                  - k^2 * mu / ( r^(3-2*alpha) ) * r ... 
+    % r, v, t derivatives wrt tau 
+    dr_dtau = v_tau ; 
+    dv_dtau = alpha * dot( r, v_tau ) / norm(r)^2 * v_tau ... 
+                  - k^2 * mu / ( norm(r)^(3-2*alpha) ) * r ... 
                   + k^2 * norm(r)^(2*alpha) * a ; 
-    d_rv_t(end) = k * r^(alpha) ; 
+    dt_dtau = k * norm(r)^alpha ; 
+    
+    % output 
+    d_rvt_dtau = [ dr_dtau ; dv_dtau ; dt_dtau ] ; 
 
 end 
 

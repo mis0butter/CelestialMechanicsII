@@ -1,4 +1,4 @@
-function d_rvt_dtau = rv_t_EOM( tau, rvt, a, mu, k, alpha ) 
+function d_rvt_dt = rv_t_EOM_normal( tau, rvt, a, mu, k, alpha ) 
 % Integrate equations of motion for Cartesian state and time velocity 
 
     r = rvt(1:3) ; 
@@ -11,7 +11,7 @@ function d_rvt_dtau = rv_t_EOM( tau, rvt, a, mu, k, alpha )
     dt_dt = 1 ; 
     
     % Sundman transformation 
-    d_rvt_dtau = k * norm(r)^alpha * [ dr_dt ; dv_dt ; dt_dt ] ; 
+    d_rvt_dt = [ dr_dt ; dv_dt ; dt_dt ] ; 
     
 end 
 

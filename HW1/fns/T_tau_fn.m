@@ -19,8 +19,21 @@ function [ T_time, T_tau ] = T_tau_fn( oe, k, mu, alpha )
         Q       = ellipke( 2*e / (1+e), 1e-18 ) ; 
         P       = 4*Q / ( k * sqrt( mu * (1+e) ) ) ; 
         T_tau   = 1/k * P ; 
-    else
-        disp("alpha =/= 0, 1, 2, or 3/2. Exiting"); 
+    elseif alpha == 3 
+        % left-hand side terms 
+        n = sqrt( mu / a^3 ) ; 
+        p = a * (1 - e^2) ; 
+        tau_terms = n * k * a^2 * p * ( 1-e^2 )^(1/2) ; 
+
+        % right-hand side term (integrated) 
+        nu = 2*pi ; 
+        nu_terms = nu + e * sin(nu) ; 
+
+        alpha = 3 ; 
+
+        T_tau = nu_terms / tau_terms ; 
+    else 
+        disp("alpha =/= 0, 1, 2, 3, or 3/2. Exiting"); 
         return 
     end 
 
