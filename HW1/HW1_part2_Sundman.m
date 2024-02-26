@@ -38,13 +38,11 @@ for alpha = [ 0, 1, 2, 3/2 ]
     % part 2.a.1: Convert the equations of motion to a new independent 
     % variable τ using the general Sundman transformation 
 
-
     % ----------------------- % 
     % part 2.a.2: numeric value of τ for 1 period of the ellipse (τP)?
 
     [ T_time, T_tau ] = T_tau_fn( oe0, k, mu, alpha ) ; 
-    sprintf( 'T_tau = %.6g for n = %.2d', T_tau, alpha ) 
-
+    sprintf( 'n = %g: T_tau = %.6g', alpha, T_tau ) 
 
     % ----------------------- % 
     % part 2.a.3: Using the general ODE solver provided on canvas to solve the 
@@ -52,8 +50,8 @@ for alpha = [ 0, 1, 2, 3/2 ]
     % Δτ = τP/q for q=50. If you don’t use Matlab, you can use any ODE solver 
     % as long as it is very clearly a fixed step integrator.
 
-    q    = 40 ; 
-    dtau_pb = T_tau / q ; 
+    q    = 50 ; 
+    dtau = T_tau / q ; 
 
     % initial state = r, v, t 
     state0 = [ rv0 ; 0 ] ; 
@@ -62,17 +60,16 @@ for alpha = [ 0, 1, 2, 3/2 ]
     a_pert = zeros(3,1) ; 
 
     [tau_hist, state] = ode78rpr( @(tau, rvt) rv_t_EOM( tau, rvt, a_pert, mu, k, alpha ), ... 
-        0, T_tau, dtau_pb, state0, tol) ; 
-
+        0, T_tau, dtau, state0, tol) ; 
+    t_hist = state(:,7) ; 
 
     % ----------------------- % 
     % part 2.a.4: Plot the XY view of the trajectory including nodes and 
     % connecting lines. 
 
     figure() 
-        plot_rv( state, sprintf( 'Cartesian trajectory for n = %d', alpha ) ) ; 
+        plot_rv( state, sprintf( 'Cartesian trajectory with time velocity for n = %g', alpha ) ) ; 
         view(0,90) 
-
 
     % ----------------------- % 
     % part 2.a.5: Plot the first six states vs. time and tau using subplots (2 
@@ -80,16 +77,26 @@ for alpha = [ 0, 1, 2, 3/2 ]
 
     titles = { 'r_x', 'r_y', 'r_z', 'v_x', 'v_y', 'v_z' } ; 
     ylabels = { 'LU', 'LU', 'LU', 'LU/TU', 'LU/TU', 'LU/TU' } ; 
+    
     figure() 
         for i = 1 : 6 
-            subplot(6,1,i) 
+            subplot(2,3,i) 
+                plot( t_hist, state(:,i) ) ; 
+                title( titles{i} ) ; 
+                if i > 3 ; xlabel('t (s)') ; end 
+                if i == 1 ; ylabel('LU') ; elseif i == 4 ; ylabel('LU/TU') ; end 
+        end 
+        sgtitle( sprintf( 'time vs rv with time velocity for n = %g', alpha ) ) ; 
+    
+    figure() 
+        for i = 1 : 6 
+            subplot(2,3,i) 
                 plot( tau_hist, state(:,i) ) ; 
                 title( titles{i} ) ; 
-                ylabel( ylabels{i} ) ; 
+                if i > 3 ; xlabel('tau') ; end 
+                if i == 1 ; ylabel('LU') ; elseif i == 4 ; ylabel('LU/TU') ; end 
         end 
-        xlabel('tau') 
-        sgtitle( sprintf( 'tau vs rv for n = %g', alpha ) ) ; 
-
+        sgtitle( sprintf( 'tau vs rv with time velocity for n = %g', alpha ) ) ; 
 
     % ----------------------- % 
     % part 2.a.6: Report |r0-rf | |v0-vf | and |tf-2πsqrt(a^3/μ)|
@@ -102,35 +109,30 @@ for alpha = [ 0, 1, 2, 3/2 ]
 
 end 
 
+
 %% loop for rv_tau_EOM 
-
-% let's get initial v_tau 
-v_tau0 = 2 * Lu_fn( u0 ) * uprime0 ; 
-v_tau0 = v_tau0(1:3) ; 
-
-% initial state = r, v_tau, t 
-state0 = [ r0; v_tau0 ; 0 ] ; 
 
 % loop 
 for alpha = [ 0, 1, 2, 3/2 ]
-    
-    
-    v_tau0 = v0 * k * norm(r0)^(alpha) ; 
+% for alpha = 3/2 
 
+    % oh god at least I have the ICs saved here 
+    r0 = rv0(1:3) ; 
+    v0 = rv0(4:6) ; 
+    
     % initial state = r, v_tau, t 
+    v_tau0 = v0 * k * norm(r0)^(alpha) ; 
     state0 = [ r0; v_tau0 ; 0 ] ; 
 
     % ----------------------- % 
     % part 2.a.1: Convert the equations of motion to a new independent 
     % variable τ using the general Sundman transformation 
 
-
     % ----------------------- % 
     % part 2.a.2: numeric value of τ for 1 period of the ellipse (τP)?
 
     [ T_time, T_tau ] = T_tau_fn( oe0, k, mu, alpha ) ; 
-    sprintf( 'T_tau = %.6g for n = %.2d', T_tau, alpha ) 
-
+    sprintf( 'n = %.2g: T_tau = %.6g', alpha, T_tau ) 
 
     % ----------------------- % 
     % part 2.a.3: Using the general ODE solver provided on canvas to solve the 
@@ -138,27 +140,23 @@ for alpha = [ 0, 1, 2, 3/2 ]
     % Δτ = τP/q for q=50. If you don’t use Matlab, you can use any ODE solver 
     % as long as it is very clearly a fixed step integrator.
 
-    q    = 40 ; 
-    dtau_pb = T_tau / q ; 
-
-    % initial state = r, v, t 
-    state0 = [ rv0 ; 0 ] ; 
+    q    = 50 ; 
+    dtau = T_tau / q ; 
 
     % zero perturbation 
     a_pert = zeros(3,1) ; 
 
     [tau_hist, state] = ode78rpr( @(tau, rvt) rv_tau_EOM( tau, rvt, a_pert, mu, k, alpha ), ... 
-        0, T_tau, dtau_pb, state0, tol) ; 
-
+        0, T_tau, dtau, state0, tol) ; 
+    t_hist = state(:,7) ; 
 
     % ----------------------- % 
     % part 2.a.4: Plot the XY view of the trajectory including nodes and 
     % connecting lines. 
 
     figure() 
-        plot_rv( state, sprintf( 'Cartesian trajectory for n = %d', alpha ) ) ; 
-%         view(0,90) 
-
+        plot_rv( state, sprintf( 'Cartesian trajectory with tau velocity for n = %g', alpha ) ) ; 
+        view(0,90) 
 
     % ----------------------- % 
     % part 2.a.5: Plot the first six states vs. time and tau using subplots (2 
@@ -166,25 +164,35 @@ for alpha = [ 0, 1, 2, 3/2 ]
 
     titles = { 'r_x', 'r_y', 'r_z', 'v_x', 'v_y', 'v_z' } ; 
     ylabels = { 'LU', 'LU', 'LU', 'LU/TU', 'LU/TU', 'LU/TU' } ; 
+    
     figure() 
         for i = 1 : 6 
-            subplot(6,1,i) 
+            subplot(2,3,i) 
+                plot( t_hist, state(:,i) ) ; 
+                title( titles{i} ) ; 
+                if i > 3 ; xlabel('t (s)') ; end 
+                if i == 1 ; ylabel('LU') ; elseif i == 4 ; ylabel('LU/TU') ; end 
+        end 
+        sgtitle( sprintf( 'time vs rv with tau velocity for n = %g', alpha ) ) ; 
+        
+    figure() 
+        for i = 1 : 6 
+            subplot(2,3,i) 
                 plot( tau_hist, state(:,i) ) ; 
                 title( titles{i} ) ; 
-                ylabel( ylabels{i} ) ; 
+                if i > 3 ; xlabel('tau') ; end 
+                if i == 1 ; ylabel('LU') ; elseif i == 4 ; ylabel('LU/TU') ; end 
         end 
-        xlabel('tau') 
-        sgtitle( sprintf( 'tau vs rv for n = %d', alpha ) ) ; 
-
+        sgtitle( sprintf( 'tau vs rv with tau velocity for n = %g', alpha ) ) ; 
 
     % ----------------------- % 
     % part 2.a.6: Report |r0-rf | |v0-vf | and |tf-2πsqrt(a^3/μ)|
     r0 = state(1, 1:3)' ; rf = state(end, 1:3)' ; 
     v0 = state(1, 4:6)' ; vf = state(end, 4:6)' ; 
     tf = state(end, end) ; tf_ana = 2*pi*sqrt( a^3 / mu ) ;  
-    sprintf( '| r0 - rf | = %.6g ', norm( r0 - rf ) ) 
-    sprintf( '| v0 - vf | = %.6g ', norm( v0 - vf ) ) 
-    sprintf( '| tf-2πsqrt(a^3/μ) | = %.6g ', norm( tf - tf_ana ) ) 
+    sprintf( 'n = %g: | r0 - rf | = %.6g ', alpha, norm( r0 - rf ) ) 
+    sprintf( 'n = %g: | v0 - vf | = %.6g ', alpha, norm( v0 - vf ) ) 
+    sprintf( 'n = %g: | tf-2*pi*sqrt(a^3/mu) | = %.6g ', alpha, norm( tf - tf_ana ) ) 
 
 end 
 
@@ -236,7 +244,7 @@ T_tau = nu_terms / tau_terms ;
 % [ T_time, T_tau ] = T_tau_fn( oe0, k, mu, alpha ) ; 
 
     q    = 40 ; 
-    dtau_pb = T_tau / q ; 
+    dtau = T_tau / q ; 
 
     % initial state = r, v, t 
     state0 = [ rv0 ; 0 ] ; 
@@ -245,7 +253,7 @@ T_tau = nu_terms / tau_terms ;
     a_pert = zeros(3,1) ; 
 
     [tau_hist, state] = ode78rpr( @(tau, rvt) rv_t_EOM( tau, rvt, a_pert, mu, k, alpha ), ... 
-        0, T_tau, dtau_pb, state0, tol) ; 
+        0, T_tau, dtau, state0, tol) ; 
 
 
 % ----------------------- % 
@@ -319,14 +327,14 @@ for q = [ 20, 40, 80, 160, 320, 640, 1280 ]
 
             % ----------------------- % 
 
-            dtau_pb = T_tau / q ; 
+            dtau = T_tau / q ; 
 
             % zero perturbation 
             a_pert = zeros(3,1) ; 
 
             % propagate 
             [tau_hist, state] = ode78rpr( @(tau, rvt) rv_t_EOM( tau, rvt, a_pert, mu, k, alpha ), ... 
-                0, T_tau, dtau_pb, state0, tol) ; 
+                0, T_tau, dtau, state0, tol) ; 
 
             % pos err 
             r0 = state(1, 1:3) ; rf = state(end, 1:3) ; 

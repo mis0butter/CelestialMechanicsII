@@ -254,7 +254,7 @@ KS_v0       = rv2KS( rv_v0 ) ;
 % get tau derivatives with nonzero perturbation 
 a           = rand(4,1) ; 
 state_prime = KS_EOM( tau, KS_v0, a, mu ) ; 
-eps_prime   = state_prime(end) ; 
+eps_prime   = state_prime(end) 
 
 
 %% part b: Apply a thrust in the VTN frame, using a thrust magnitude of 
@@ -280,18 +280,21 @@ dtau      = dtau_hist(end) ;
 % projections on the same plot.
 
 figure() ; 
-    subplot(4,1,1)  
-        plot_rv( rv_num, '3D view' ) 
-    subplot(4,1,2) 
-        plot_rv( rv_num, 'XY' )
-        view(0,90) 
-    subplot(4,1,3) 
-        plot_rv( rv_num, 'YZ' )
-        view(90,0)
-    subplot(4,1,4) 
-        plot_rv( rv_num, 'XZ' )
-        view(0,0) 
-    sgtitle('Cartesian trajectory of perturbed motion') ; 
+
+    plot3( rv_num(:,1), rv_num(:,2), rv_num(:,3), 'linewidth', 2 ) ; 
+    hold on ; grid on ; 
+    view(30, 30) 
+    
+    xlimits  = xlim ; ylimits = ylim ; zlimits = zlim ; 
+    rv_xflat = rv_num ; rv_xflat(:,1) = min(xlimits) ; 
+    rv_yflat = rv_num ; rv_yflat(:,2) = max(ylimits) ; 
+    rv_zflat = rv_num ; rv_zflat(:,3) = min(zlimits) ; 
+    
+    plot_rv_noscatter( rv_xflat) ; plot_rv_noscatter( rv_yflat ) ; plot_rv_noscatter( rv_zflat ) ; 
+    
+    title('Cartesian trajectory of perturbed motion') ; 
+    xlabel('x (LU)') ; ylabel('y (LU)') ; zlabel('z (LU)') ; 
+    
     
 % part e: Plot the K numerical check as a function of tau 
 [ K_A_num, K_B_num ]  = K_check( state_num, mu, 1, N, 'Numerical' ) ; 
