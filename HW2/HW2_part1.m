@@ -1,0 +1,98 @@
+% HW 2 part 1 
+
+
+%% 1.a: 
+
+mu = 1.0 ; 
+
+
+%% 1.b: Assume e < 1, discuss the character of the orbit for the c=0 and c>0 cases. Verify your
+% conclusions using numerical integration in a Cartesian frame 
+
+k = 1 ;  
+h = 1 ;  
+e = 0.2 ; 
+theta = 1 ; 
+
+% ode options 
+toler   = 1e-8;         % 1e-14 accurate; 1e-6 coarse 
+options = odeset('reltol', toler, 'abstol', toler ); 
+
+% Circular orbit ICs 
+r0 = [ .8 ; 0 ; 0 ] ; 
+v0 = [ 0 ; 0.96825 ; 0 ] ; 
+
+% r 
+alpha = sqrt( 1 + c / h^2 ) ; 
+num   = h^2 / k ; 
+den   = 1 / alpha^2 + e * cos( alpha * theta ) ;  
+r     = num / den ; 
+
+% c > 0 case 
+c = 0.2 ; 
+
+% integrate 
+tspan = [ 0 10 ] ; 
+[t,x] = ode45(@(t, rv) central_force(t, rv, k, c), tspan, [r0 v0], options); 
+
+% plot 
+figure 
+    plot3( x(:,1), x(:,2), x(:,3) ) ; 
+    title( 'c > 0' ) ;
+    
+% c = 0 case 
+c = 0 ; 
+tspan = [ 0 10 ] ; 
+[t,x] = ode45(@(t, rv) central_force(t, rv, k, c), tspan, [r0 v0], options); 
+figure 
+    plot3( x(:,1), x(:,2), x(:,3) ) ; 
+    title( 'c = 0' ) ;
+
+
+
+%% 1.c: Assuming h=1, k=1, c=e=0.2, solve (via quadrature) for the time required from theta=0..1 
+
+% treat r as a definite integral 
+syms x
+expr = x*log(1+x);
+F = int(expr,[0 1])
+
+syms theta 
+c = 0.2 ; 
+k = 1 ;  
+h = 1 ;  
+e = 0.2 ; 
+
+alpha = sqrt( 1 + c / h^2 ) ; 
+
+num   = h^2 / k ; 
+den   = 1 / alpha^2 + e * cos( alpha * theta ) ;  
+
+r     = num / den ; 
+F     = int( r^2,[0 1] ) ; 
+double(F) 
+
+
+
+
+%% subfunctions 
+
+function drv = central_force( t, rv, k, c ) 
+% Integrate equations of motion for Cartesian state and time velocity 
+
+    r = rv(1:3) ; r_hat = r / norm(r) ; 
+    v = rv(4:6) ; 
+    
+    % central force 
+    P = k / norm(r)^2 - c / norm(r)^3 ; 
+
+    % r, v, derivatives wrt time 
+    dr = v ; 
+    dv = -P * r_hat ; 
+    
+    % output  
+    drv = [ dr ; dv ] ; 
+    
+end 
+
+
