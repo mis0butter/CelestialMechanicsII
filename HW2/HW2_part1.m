@@ -9,7 +9,7 @@ mu = 1.0 ;
 %% 1.b: Assume e < 1, discuss the character of the orbit for the c=0 and c>0 cases. Verify your
 % conclusions using numerical integration in a Cartesian frame 
 
-k = 1 ;  
+k = 5 ;  
 h = 1 ;  
 e = 0.2 ; 
 theta = 1 ; 
@@ -19,8 +19,9 @@ toler   = 1e-8;         % 1e-14 accurate; 1e-6 coarse
 options = odeset('reltol', toler, 'abstol', toler ); 
 
 % Circular orbit ICs 
-r0 = [ .8 ; 0 ; 0 ] ; 
-v0 = [ 0 ; 0.96825 ; 0 ] ; 
+
+r0 = [ 1*r_c ; 0 ; 0 ] ; 
+v0 = [ 0 ; 1.1*v_c ; 0 ] ; 
 
 % r 
 alpha = sqrt( 1 + c / h^2 ) ; 
@@ -32,22 +33,24 @@ r     = num / den ;
 c = 0.2 ; 
 
 % integrate 
-tspan = [ 0 10 ] ; 
+tspan = [ 0 T_c*250 ] ; 
 [t,x] = ode45(@(t, rv) central_force(t, rv, k, c), tspan, [r0 v0], options); 
 
 % plot 
 figure 
     plot3( x(:,1), x(:,2), x(:,3) ) ; 
-    title( 'c > 0' ) ;
+    hold on ; grid on ; 
     
 % c = 0 case 
 c = 0 ; 
-tspan = [ 0 10 ] ; 
+tspan = [ 0 T_c*10  ] ; 
 [t,x] = ode45(@(t, rv) central_force(t, rv, k, c), tspan, [r0 v0], options); 
-figure 
     plot3( x(:,1), x(:,2), x(:,3) ) ; 
-    title( 'c = 0' ) ;
-
+    scatter3( 0,0,0, 'filled', 'k' ) ; 
+    legend( 'c > 0', 'c = 0' ) ; 
+    title( 'Character of orbit for c = 0, c > 0 cases' ) 
+    xlabel('x') ; ylabel('y') ; zlabel('z') ; 
+    
 
 
 %% 1.c: Assuming h=1, k=1, c=e=0.2, solve (via quadrature) for the time required from theta=0..1 
@@ -72,6 +75,25 @@ r     = num / den ;
 F     = int( r^2,[0 1] ) ; 
 double(F) 
 
+
+%% 1.d, e, f: circular orbit radius, velocity, period 
+
+h = 1 ; 
+k = 1 ;  
+c = 0.2 ; 
+
+r_c = ( h^2 + c ) / k  
+v_c = sqrt( k/r_c - c/r_c^2 )  
+T_c = 2 * pi * r_c^2 / h 
+
+
+%% 1.f: stability 
+
+u_c = 1 / r_c 
+P_u = k * u_c^2 - c * u_c^3 ; 
+dP_u = 2 * k * u_c - 3 * c * u_c^2 
+
+term = 3 - u_c * dP_u / P_u 
 
 
 
