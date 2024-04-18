@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Input file
-input_file="starkCoeffs_inter.m"
+input_file="starkCoeffs_generic.m"
 
 dos2unix "$input_file"
 

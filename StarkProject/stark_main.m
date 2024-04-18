@@ -17,10 +17,10 @@ alphaSun = 2 ;
 %   2: alpha = 2, tau = true anomaly
 %   3: alpha = 3/2, tau = intermediate anomaly
 %   4: alpha = alphaSun, generic Sundman transformation: user provided alpha
-caseSun = 3 ; 
+caseSun = 4 ; 
 
 % order: order of the TS integration 
-order = 18 ; 
+order = 3 ; 
 
 % Xf: Integrated vector 
 Xf = zeros(7,1) ; 
