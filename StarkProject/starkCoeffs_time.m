@@ -71,29 +71,29 @@ function FGHT = starkCoeffs_time(X, acc, order, cSun, FGHT)
             
             stark_time_order_12 
             
-%         case (13) 
-%             
-%             stark_time_order_13 
-%             
-%         case (14) 
-%             
-%             stark_time_order_14 
-%             
-%         case (15) 
-%             
-%             stark_time_order_15 
-%             
-%         case (16) 
-%             
-%             stark_time_order_16 
-%             
-%         case (17) 
-%             
-%             stark_time_order_17 
-%             
-%         case (18) 
-%             
-%             stark_time_order_18 
+        case (13) 
+            
+            stark_time_order_13 
+            
+        case (14) 
+            
+            stark_time_order_14 
+            
+        case (15) 
+            
+            stark_time_order_15 
+            
+        case (16) 
+            
+            stark_time_order_16 
+            
+        case (17) 
+            
+            stark_time_order_17 
+            
+        case (18) 
+            
+            stark_time_order_18 
             
         otherwise 
             
