@@ -19,81 +19,81 @@ function FGHT = starkCoeffs_time(X, acc, order, cSun, FGHT)
     p2 = acc(1)*acc(1) + acc(2)*acc(2) + acc(3)*acc(3) ; 
     k  = cSun ; 
 
-    switch (order)
+    switch (order) 
 
         case (0)
 
         case (1) 
             
-            run starkCoeffs/time/order_1 
+            stark_time_order_1 
             
         case (2) 
             
-            run starkCoeffs/time/order_2 
+            stark_time_order_2 
             
         case (3) 
             
-            run starkCoeffs/time/order_3 
+            stark_time_order_3 
             
         case (4) 
             
-            run starkCoeffs/time/order_4 
+            stark_time_order_4 
 
         case (5) 
             
-            run starkCoeffs/time/order_5 
+            stark_time_order_5 
             
         case (6) 
             
-            run starkCoeffs/time/order_6 
+            stark_time_order_6 
             
         case (7) 
             
-            run starkCoeffs/time/order_7 
+            stark_time_order_7 
 
         case (8) 
             
-            run starkCoeffs/time/order_8 
+            stark_time_order_8 
 
         case (9) 
             
-            run starkCoeffs/time/order_9 
+            stark_time_order_9 
 
         case (10) 
             
-            run starkCoeffs/time/order_10 
+            stark_time_order_10 
 
         case (11) 
             
-            run starkCoeffs/time/order_11 
+            stark_time_order_11 
 
         case (12) 
             
-            run starkCoeffs/time/order_12 
+            stark_time_order_12 
             
 %         case (13) 
 %             
-%             run starkCoeffs/time/order_13 
+%             stark_time_order_13 
 %             
 %         case (14) 
 %             
-%             run starkCoeffs/time/order_14 
+%             stark_time_order_14 
 %             
 %         case (15) 
 %             
-%             run starkCoeffs/time/order_15 
+%             stark_time_order_15 
 %             
 %         case (16) 
 %             
-%             run starkCoeffs/time/order_16 
+%             stark_time_order_16 
 %             
 %         case (17) 
 %             
-%             run starkCoeffs/time/order_17 
+%             stark_time_order_17 
 %             
 %         case (18) 
 %             
-%             run starkCoeffs/time/order_18 
+%             stark_time_order_18 
             
         otherwise 
             

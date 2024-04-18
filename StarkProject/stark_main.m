@@ -46,17 +46,19 @@ accuracyFlag = logical(zeros(4,1)) ;
 
 X0   = [ 0.2d0, 0.d0, 0.d0, 0.d0, 3.0d0, 0.d0, 0.d0 ]' ; 
 
+
+
 acc  = [ 1.d-1, 1.d-1, 1.d-1 ]' ; 
 dtau = 6.283185307179589D-1 ; 
 
 cSun     = 1.0d0 ; 
-caseSun  = 0 ; 
+caseSun  = 3 ; 
 alphaSun = 2.d0 ; 
 
 caseStark    = true ; 
 divSafeguard = true ; 
 
-order = 12 ; 
+order = 8 ; 
 accuracyFlag = [ true, true, true, true ]' ; 
 
 disp('*** Starting the F&G Stark series propagation ***')
