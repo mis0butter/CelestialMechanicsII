@@ -2,10 +2,18 @@
 
 % declare variables 
 
-% X0: Initial Conditions, acc: Stark acceleration (3D), dtau: delta tau for integration
+% X0: Initial Conditions, acc: Stark acceleration (3D), 
 X0   = [ 0.2d0, 0.d0, 0.d0, 0.d0, 3.0d0, 0.d0, 0.d0 ]' ; 
 acc  = [ 1.d-1, 1.d-1, 1.d-1 ]' ; 
-dtau = 6.283185307179589D-1 ; 
+% dtau = 1e-5 ; 
+
+% get OEs 
+mu  = 1 ; 
+rv0 = X0(1:6) ; 
+oe0 = rv2oe( rv0, mu ) ;  
+a = oe0(1) ; e = oe0(2) ; 
+
+% compute eccentric anomaly 
 
 % Sundman transformation parameters (dt = cSun * r**alphaSun * dtau)
 cSun     = 1 ; 
@@ -17,10 +25,41 @@ alphaSun = 2 ;
 %   2: alpha = 2, tau = true anomaly
 %   3: alpha = 3/2, tau = intermediate anomaly
 %   4: alpha = alphaSun, generic Sundman transformation: user provided alpha
-caseSun = 4 ; 
+caseSun = 2 ; 
+
+% tau period 
+n = sqrt( mu / a^3 ) ; 
+
+% 0: alpha = 0, tau = time 
+if casesun == 0 
+    tau_p = 2 * pi / ( n * cSun ) ; 
+
+% 1: alpha = 1, tau = eccentric anomaly 
+elseif caseSun == 1 
+    tau_p = 2 * pi / ( n * cSun * a ) ;  
+
+% 2: alpha = 2, tau = true anomaly 
+elseif caseSun == 2 
+    tau_p = 2 * pi / ( n * cSun * sqrt( a * ( 1 - e^2 ) ) ) ; 
+
+% 3: alpha = 3/2, tau = intermediate anomaly 
+elseif caseSun == 3 
+    M     = sqrt( 2 * e / ( 1 + e ) ) ; 
+    tau_p = 4 * K( M ) / ( cSun * sqrt( mu * ( 1 + e ) ) ) ; 
+
+% 4: alpha = alphaSun, generic Sundman transformation: user provided alpha  
+else 
+    tau_p = 2 * pi ; 
+    
+end 
+
+% dtau: delta tau for integration for N steps 
+% dtau = 6.283185307179589D-1 ; 
+N    = 50 ; 
+dtau = tau_p / N ; 
 
 % order: order of the TS integration 
-order = 3 ; 
+order = 4 ; 
 
 % Xf: Integrated vector 
 Xf = zeros(7,1) ; 
@@ -54,13 +93,18 @@ disp('')
 disp(['Case: ', num2str(caseSun), ' cSun: ', num2str(cSun), ' alphaSun: ', num2str(alphaSun), ' order: ', num2str(order)])
 disp('')
 
+% propagate one dtau step 
 [ Xf, accuracyOut, statusFlag ] = FGStark_oneStep_propagator( X0, acc, dtau, order, ... 
     cSun, caseSun, alphaSun, caseStark, divSafeguard, ... 
     accuracyFlag, Xf, accuracyOut, statusFlag ) ; 
 
-disp('Xf: ') ; disp(Xf) 
+%% display checks 
 
-%% subfunctions 
+disp('Status: ' ) ; disp(statusFlag) ; 
+disp('Xf: ') ; disp(Xf) 
+disp('del Hamiltonian:') ; disp(accuracyOut(1)) ; 
+
+        
 
 
 
