@@ -103,25 +103,10 @@ disp('')
     accuracyFlag, Xf, accuracyOut, statusFlag ) ; 
 
 % propagate N dtau steps 
-Xk   = X0 ; 
-Xkp1 = Xf ; 
-X_hist = [ Xk' ] ; 
-accuracy_hist = [ accuracyOut ] ; 
-for i = 1 : N 
-    
-    % propagate one dtau step 
-    [ Xkp1, accuracyOut, statusFlag ] = FGStark_oneStep_propagator( Xk, acc, dtau, order, ... 
+[ X_hist, accuracy_hist, status_hist ] = FGStark_Nstep_propagator( X0, acc, dtau, N, order, ... 
         cSun, caseSun, alphaSun, caseStark, divSafeguard, ... 
-        accuracyFlag, Xkp1, accuracyOut, statusFlag ) ;     
+        accuracyFlag, Xf, accuracyOut, statusFlag ) ; 
     
-    % save hist 
-    X_hist = [ X_hist ; Xkp1' ] ; 
-    accuracy_hist = [ accuracy_hist ; accuracyOut ] ; 
-    
-    % ready for next iter 
-    Xk = Xkp1 ; 
-    
-end 
 
 %% display checks and plot 
 
@@ -129,9 +114,10 @@ disp('Status: ' ) ; disp(statusFlag) ;
 disp('Xf: ') ; disp(Xf) 
 disp('del Hamiltonian:') ; disp(accuracyOut(1)) ; 
 
-figure() ; hold on ; grid on ; 
-    semilogy( accuracy_hist(:,1) ) ; 
-    title( sprintf( ' alpha = %d', alphaSun ) ) ; 
+figure() ; 
+    subplot(2,1,1) ; 
+    semilogy( accuracy_hist(:,1) ) ; hold on ; grid on ; 
+    title( sprintf( 'delta Hamiltonian: alpha = %d, order = %d', alphaSun, order ) ) ; 
 
         
 
