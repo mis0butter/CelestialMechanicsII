@@ -4,7 +4,7 @@
 
 % X0: Initial Conditions, acc: Stark acceleration (3D), 
 X0   = [ 0.2d0, 0.d0, 0.d0, 0.d0, 3.0d0, 0.d0, 0.d0 ]' ; 
-acc  = [ 1.d-1, 1.d-1, 1.d-1 ]' ; 
+acc  = 0.1 * [ 1.d-1, 1.d-1, 1.d-1 ]' ; 
 % dtau = 1e-5 ; 
 
 % get OEs 
@@ -25,41 +25,15 @@ alphaSun = 2 ;
 %   2: alpha = 2, tau = true anomaly
 %   3: alpha = 3/2, tau = intermediate anomaly
 %   4: alpha = alphaSun, generic Sundman transformation: user provided alpha
-caseSun = 2 ; 
+caseSun = 1 ; 
 
 % tau period 
-n = sqrt( mu / a^3 ) ; 
-
-% 0: alpha = 0, tau = time 
-if caseSun == 0 
-    tau_p = 2 * pi / ( n * cSun ) ; 
-    alphaSun = 0 ; 
-
-% 1: alpha = 1, tau = eccentric anomaly 
-elseif caseSun == 1 
-    tau_p = 2 * pi / ( n * cSun * a ) ;  
-    alphaSun = 1 ; 
-
-% 2: alpha = 2, tau = true anomaly 
-elseif caseSun == 2 
-    tau_p = 2 * pi / ( n * cSun * sqrt( a * ( 1 - e^2 ) ) ) ; 
-    alphaSun = 2 ; 
-
-% 3: alpha = 3/2, tau = intermediate anomaly 
-elseif caseSun == 3 
-    M     = sqrt( 2 * e / ( 1 + e ) ) ; 
-    tau_p = 4 * K( M ) / ( cSun * sqrt( mu * ( 1 + e ) ) ) ; 
-    alphaSun = 3/2 ; 
-
-% 4: alpha = alphaSun, generic Sundman transformation: user provided alpha  
-else 
-    tau_p = 2 * pi ; 
-    
-end 
+[ tau_p, alphaSun ] = taup_caseSun( caseSun, a, e, mu, cSun ) ; 
+tau_p = 10 * tau_p ; 
 
 % dtau: delta tau for integration for N steps 
 % dtau = 6.283185307179589D-1 ; 
-N    = 50 ; 
+N    = 20 ; 
 dtau = tau_p / N ; 
 
 % order: order of the TS integration 
@@ -69,7 +43,7 @@ order = 8 ;
 Xf = zeros(7,1) ; 
 
 % Accuracy measurements 
-accuracyOut = zeros(4,1) ; 
+accuracyOut = zeros(1,4) ; 
 
 % Indicates whether the user wants a Stark or Kepler propagation 
 caseStark = true ; 
@@ -97,28 +71,107 @@ disp('')
 disp(['Case: ', num2str(caseSun), ' cSun: ', num2str(cSun), ' alphaSun: ', num2str(alphaSun), ' order: ', num2str(order)])
 disp('')
 
-% propagate one dtau step 
-[ Xf, accuracyOut, statusFlag ] = FGStark_oneStep_propagator( X0, acc, dtau, order, ... 
-    cSun, caseSun, alphaSun, caseStark, divSafeguard, ... 
-    accuracyFlag, Xf, accuracyOut, statusFlag ) ; 
-
 % propagate N dtau steps 
-[ X_hist, accuracy_hist, status_hist ] = FGStark_Nstep_propagator( X0, acc, dtau, N, order, ... 
+% [ X_hist, accuracy_hist, status_hist, acc_hist ] = FGStark_Nstep_propagator( X0, acc, dtau, N, order, ... 
+%         cSun, caseSun, alphaSun, caseStark, divSafeguard, ... 
+%         accuracyFlag, Xf, accuracyOut, statusFlag ) ; 
+[ X_hist, accuracy_hist, status_hist, acc_hist ] = FGStark_Ntaup_propagator( ... 
+        X0, acc, dtau, N, order, mu, ... 
         cSun, caseSun, alphaSun, caseStark, divSafeguard, ... 
         accuracyFlag, Xf, accuracyOut, statusFlag ) ; 
     
 
 %% display checks and plot 
 
+oe_hist = [ ] ; E_hist = [ ] ; 
+for i = 1 : size(X_hist, 1) 
+    
+    rv = X_hist( i, 1:6 ) ; 
+    oe = rv2oe( rv, mu ) ;  
+    
+    e  = oe(2) ; 
+    nu = oe(6) ; 
+    E  = nu2E_fn( nu, e ) ; 
+    
+    oe_hist = [ oe_hist ; oe' ] ; 
+    E_hist  = [ E_hist ; E ] ; 
+    
+end 
+
+% make E_hist propagate forward 
+for i = 1 : length(E_hist) - 1 
+    
+    if E_hist(i) > E_hist(i+1) 
+        E_hist(i+1) = pi + ( pi - E_hist(i+1) ) ; 
+    end 
+    
+end 
+
 disp('Status: ' ) ; disp(statusFlag) ; 
 disp('Xf: ') ; disp(Xf) 
 disp('del Hamiltonian:') ; disp(accuracyOut(1)) ; 
 
 figure() ; 
-    subplot(2,1,1) ; 
-    semilogy( accuracy_hist(:,1) ) ; hold on ; grid on ; 
-    title( sprintf( 'delta Hamiltonian: alpha = %d, order = %d', alphaSun, order ) ) ; 
+    subplot(3,1,1) ; 
+        semilogy( E_hist, accuracy_hist(:,1), 'b' ) ; hold on ; grid on ; 
+        scatter( E_hist, accuracy_hist(:,1), 'b' ) ; 
+        xlabel( {'Eccentric anomaly E'; ''} ) ; 
+        ylabel( 'delta H' ) ; 
+        title( sprintf( 'alpha = %.2g, order = %d', alphaSun, order ) ) ; 
+    subplot(3,1,2:3) ; 
+        scatter3( 0,0,0, '+k' ) ; hold on ; grid on ; 
+        plot3( X_hist(:,1), X_hist(:,2), X_hist(:,3), 'b' ) ; 
+        scatter3( X_hist(:,1), X_hist(:,2), X_hist(:,3), 'b' )
+        scatter3( X_hist(1,1), X_hist(1,2), X_hist(1,3), '^g', 'filled' ) ; 
+        scatter3( X_hist(end,1), X_hist(end,2), X_hist(end,3), 'diamondr', 'filled' ) ; 
+        view(0,90)
+        xlabel('x') ; ylabel('y') ; zlabel('z') ; 
+        title( sprintf( 'trajectory' ) ) ; 
+        
 
+%% control policy 
+
+figure() ; 
+    subplot(3,1,1) ; 
+        semilogy( acc_hist, 'b' ) ; hold on ; grid on ; 
+        scatter( [ 1 : length(acc_hist) ], acc_hist, 'b' ) ; 
+        xlabel( {'Segment'; ''} ) ; ylabel('LU/TU^2') ; 
+        title( 'Acc mag' ) ; 
+    subplot(3,1,2:3) ; 
+        scatter3( 0,0,0, '+k' ) ; hold on ; grid on ; 
+        plot3( X_hist(:,1), X_hist(:,2), X_hist(:,3), 'b' ) ; 
+        scatter3( X_hist(:,1), X_hist(:,2), X_hist(:,3), 'b' )
+        scatter3( X_hist(1,1), X_hist(1,2), X_hist(1,3), '^g', 'filled' ) ; 
+        scatter3( X_hist(end,1), X_hist(end,2), X_hist(end,3), 'diamondr', 'filled' ) ; 
+        view(0,90)
+        xlabel('x') ; ylabel('y') ; zlabel('z') ; 
+        title( sprintf( 'trajectory' ) ) ; 
+    sgtitle( sprintf( 'alpha = %.2g, order = %d', alphaSun, order ) ) ;         
+
+
+%% subfunctions 
+
+% "Convert true anomaly to eccentric anomaly"
+function E = nu2E_fn( nu, e ) 
+
+    % elliptic 
+    if e < 1.0 
+        E = 2 * atan( sqrt( (1-e)/(1+e) ) * tan(nu/2) ) ; 
+
+    % hyperbolic 
+    else 
+        E = acosh( (e+cos(nu)) / (1+e*cos(nu)) ) ; 
+        if nu < 0.0 || nu > pi 
+            E = -E ; 
+        end 
+    end 
+
+    if E < 0.0 
+        E = 2*pi + E ; 
+    end
+
+%     return E        # eccentric anomaly [rad] 
+end 
         
 
 
