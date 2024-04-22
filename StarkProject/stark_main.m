@@ -3,8 +3,8 @@
 % declare variables 
 
 % X0: Initial Conditions, acc: Stark acceleration (3D), 
-X0   = [ 0.2d0, 0.d0, 0.d0, 0.d0, 3.0d0, 0.d0, 0.d0 ]' ; 
-acc  = 0.1 * [ 1.d-1, 1.d-1, 1.d-1 ]' ; 
+X0   = [ 0.2d0, 0.d0, 0.d0, 0.d0, 3.0d0, 0.d0, 0.d0 ] ; 
+acc  = 0.1 * [ 1.d-1, 1.d-1, 1.d-1 ] ; 
 % dtau = 1e-5 ; 
 
 % get OEs 
@@ -40,7 +40,7 @@ dtau = tau_p / N ;
 order = 8 ; 
 
 % Xf: Integrated vector 
-Xf = zeros(7,1) ; 
+Xf = zeros(1,7) ; 
 
 % Accuracy measurements 
 accuracyOut = zeros(1,4) ; 
@@ -57,7 +57,7 @@ statusFlag = 0 ;
 
 % Indicates which accuracy measurements are to be computed 
 % (1 = Hamiltonian, 2 = delR, 3 = delV, 4 = delT)
-accuracyFlag = [ true, true, true, true ]' ; 
+accuracyFlag = [ true, true, true, true ] ; 
 
 
 %% begin subroutine 

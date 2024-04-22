@@ -8,7 +8,7 @@ q = 10^(-3) ;
     
 Xk   = X0 ; 
 Xkp1 = Xf ; 
-X_hist        = [ Xk' ] ; 
+X_hist        = [ Xk ] ; 
 accuracy_hist = [ accuracyOut ] ; 
 status_hist   = [ statusFlag ] ; 
 acc_hist      = [  ] ; 
@@ -32,7 +32,7 @@ for i = 1 : N
         accuracyFlag, Xkp1, accuracyOut, statusFlag ) ;     
     
     % save hist 
-    X_hist        = [ X_hist ; Xkp1' ] ; 
+    X_hist        = [ X_hist ; Xkp1 ] ; 
     accuracy_hist = [ accuracy_hist ; accuracyOut ] ; 
     status_hist   = [ status_hist ; statusFlag ] ; 
     acc_hist      = [ acc_hist ; norm(acc) ] ; 
