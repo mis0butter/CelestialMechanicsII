@@ -72,13 +72,23 @@ disp(['Case: ', num2str(caseSun), ' cSun: ', num2str(cSun), ' alphaSun: ', num2s
 disp('')
 
 % propagate N dtau steps 
-[ X_hist, accuracy_hist, status_hist, acc_hist ] = FGStark_Nstep_propagator( X0, acc, dtau, N, order, ... 
+[ X_hist, accuracy_hist, status_hist, acc_hist ] = FGStark_Nstep_ctrl_prop( X0, acc, dtau, N, order, ... 
         cSun, caseSun, alphaSun, caseStark, divSafeguard, ... 
         accuracyFlag, Xf, accuracyOut, statusFlag ) ; 
+% [ X_hist, accuracy_hist, status_hist, acc_hist ] = FGStark_Nstep_propagator( X0, acc, dtau, N, order, ... 
+%         cSun, caseSun, alphaSun, caseStark, divSafeguard, ... 
+%         accuracyFlag, Xf, accuracyOut, statusFlag ) ; 
 % [ X_hist, accuracy_hist, status_hist, acc_hist ] = FGStark_Ntaup_propagator( ... 
 %         X0, acc, dtau, N, order, mu, ... 
 %         cSun, caseSun, alphaSun, caseStark, divSafeguard, ... 
 %         accuracyFlag, Xf, accuracyOut, statusFlag ) ; 
+
+acc_hist_norm = [ ] ; 
+for i = 1 : size(acc_hist, 1) 
+    
+    acc_hist_norm = [ acc_hist_norm ; norm(acc_hist(i,:)) ] ; 
+    
+end 
     
 
 %% display checks and plot 
@@ -129,14 +139,15 @@ figure() ;
         title( sprintf( 'trajectory' ) ) ; 
         
 
-%% control policy 
+%% plot control policy 
 
 figure() ; 
     subplot(3,1,1) ; 
-        semilogy( acc_hist, 'b' ) ; hold on ; grid on ; 
-        scatter( [ 1 : length(acc_hist) ], acc_hist, 'b' ) ; 
-        xlabel( {'Segment'; ''} ) ; ylabel('LU/TU^2') ; 
-        title( 'Acc mag' ) ; 
+        semilogy( acc_hist_norm, 'b' ) ; hold on ; grid on ; 
+        scatter( [ 1 : length(acc_hist) ], acc_hist_norm, 'b' ) ; 
+        xlabel( {'Segment'; ''} ) ; 
+        ylabel( 'Acc mag (LU/TU^2)' ) ; 
+        title( sprintf( 'alpha = %.2g, order = %d', alphaSun, order ) ) ;         
     subplot(3,1,2:3) ; 
         scatter3( 0,0,0, '+k' ) ; hold on ; grid on ; 
         plot3( X_hist(:,1), X_hist(:,2), X_hist(:,3), 'b' ) ; 
@@ -146,7 +157,14 @@ figure() ;
         view(0,90)
         xlabel('x') ; ylabel('y') ; zlabel('z') ; 
         title( sprintf( 'trajectory' ) ) ; 
-    sgtitle( sprintf( 'alpha = %.2g, order = %d', alphaSun, order ) ) ;         
+        
+        
+%% try fmincon 
+
+fun = @(x)100*(x(2)-x(1)^2)^2 + (1-x(1))^2 ;  
+x0  = [-1, 2] ; 
+
+x = fmincon( fun, x0 ) 
 
 
 %% subfunctions 
@@ -170,7 +188,6 @@ function E = nu2E_fn( nu, e )
         E = 2*pi + E ; 
     end
 
-%     return E        # eccentric anomaly [rad] 
 end 
         
 
