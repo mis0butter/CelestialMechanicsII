@@ -1,5 +1,5 @@
 function [ X_hist, accuracy_hist, status_hist, acc_hist ] = FGStark_Nstep_ctrl_prop( ... 
-    X0, acc, dtau, N, order, ... 
+    X0, acc_hist, dtau, N, order, ... 
     cSun, caseSun, alphaSun, caseStark, divSafeguard, ... 
     accuracyFlag, Xf, accuracyOut, statusFlag ) 
 
@@ -11,7 +11,6 @@ function [ X_hist, accuracy_hist, status_hist, acc_hist ] = FGStark_Nstep_ctrl_p
     X_hist        = [ Xk ] ; 
     accuracy_hist = [ accuracyOut ] ; 
     status_hist   = [ statusFlag ] ; 
-    acc_hist      = [  ] ; 
 
     for i = 1 : N 
 
@@ -20,9 +19,8 @@ function [ X_hist, accuracy_hist, status_hist, acc_hist ] = FGStark_Nstep_ctrl_p
         nu_k = oe_k(6) ; 
         r_norm = norm( Xk(1:3) ) ;
 
-        % orient acc in same direction as velocity 
-        v_vec = Xk(4:6) ; 
-        acc   = q / r_norm * ( 1 + cos(nu_k) ) * v_vec ;  
+        % acc 
+        acc = acc_hist(i,:) ; 
 
         % propagate one dtau step 
         [ Xkp1, accuracyOut, statusFlag ] = FGStark_oneStep_propagator( Xk, acc, dtau, order, ... 
@@ -33,8 +31,7 @@ function [ X_hist, accuracy_hist, status_hist, acc_hist ] = FGStark_Nstep_ctrl_p
         X_hist        = [ X_hist ; Xkp1 ] ; 
         accuracy_hist = [ accuracy_hist ; accuracyOut ] ; 
         status_hist   = [ status_hist ; statusFlag ] ; 
-        acc_hist      = [ acc_hist ; acc ] ; 
-
+        
         % ready for next iter 
         Xk = Xkp1 ; 
 
